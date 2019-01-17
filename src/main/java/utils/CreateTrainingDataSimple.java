@@ -29,6 +29,8 @@ public class CreateTrainingDataSimple {
         inDir=new File(".\\resources\\Concisus-v3\\text_files\\aviation\\spanish");
         flist=inDir.listFiles();
 
+        System.out.println("Colau");
+
         for(int f=0;f<flist.length;f++) {
             floc=flist[f].getAbsolutePath();
             try {
