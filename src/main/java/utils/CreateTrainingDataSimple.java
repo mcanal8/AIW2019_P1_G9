@@ -5,48 +5,28 @@
  */
 package utils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
+import utils.fileUtils.FileUtils;
 
 /**
  *
  * @author Horacio
  */
 public class CreateTrainingDataSimple {
-    
+
+    private final static Logger log = Logger.getLogger(CreateTrainingDataSimple.class);
+
     public static void main(String[] args) {
-      /* diectory to process */
-        File inDir;
-        File[] flist;
-        BufferedReader reader;
-        String floc;
-        String line;
-        String text;
-        /* airplane accidents spanish */
-        inDir=new File(".\\resources\\Concisus-v3\\text_files\\aviation\\spanish");
-        flist=inDir.listFiles();
 
-        System.out.println("Colau");
+        // Logging config
+        BasicConfigurator.configure();
 
-        for(int f=0;f<flist.length;f++) {
-            floc=flist[f].getAbsolutePath();
-            try {
-                reader=new BufferedReader(new FileReader(floc));
-                text="";
-                while((line=reader.readLine())!=null) {
-                    line=line.replaceAll("'", " ");
-                    text=text+line+" ";
-                }
-                System.out.println("'"+text+"',"+"aviation");
-            } catch (FileNotFoundException ex) {
-                ex.printStackTrace();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-    
-}
+        log.info("Text Classification and Extraction App. " +
+                "This App Recognizes texts belonging to the following two domain: terrorist attacks and aviation accidents");
+
+        // Generating WEKA .arff file
+        FileUtils.extract();
+
+    }
 }
