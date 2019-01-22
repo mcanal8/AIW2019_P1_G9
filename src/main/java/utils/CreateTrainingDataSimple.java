@@ -9,10 +9,6 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import utils.fileUtils.FileUtils;
 
-/**
- *
- * @author Horacio
- */
 public class CreateTrainingDataSimple {
 
     private final static Logger log = Logger.getLogger(CreateTrainingDataSimple.class);
