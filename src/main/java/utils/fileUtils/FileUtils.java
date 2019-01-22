@@ -76,6 +76,7 @@ public class FileUtils {
             out.write(line);
             out.newLine();
             out.flush();
+            out.close();
         } catch (IOException e) {
             log.error(e.getMessage() != null ? e.getMessage() : "ERROR writing line to output file.");
         }
