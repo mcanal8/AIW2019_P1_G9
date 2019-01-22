@@ -25,8 +25,9 @@ public class CreateTrainingDataSimple {
         log.info("Text Classification and Extraction App. " +
                 "This App Recognizes texts belonging to the following two domain: terrorist attacks and aviation accidents");
 
-        // Generating WEKA .arff file
+        // Extracting text from text_files and merging to resultFile.txt
         FileUtils.extract();
 
+        // TODO: Generating WEKA .arff file
     }
 }
