@@ -1,16 +1,18 @@
 package utils.fileUtils;
 
+import enums.Domains;
+import enums.RawDomains;
 import org.apache.log4j.Logger;
 
 import java.io.*;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 
-public class FileUtils {
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
+
+public class FileUtils implements FileUtilsInterface{
 
     private final static Logger log = Logger.getLogger(FileUtils.class);
     private static final String TEXT_FILES_PATH = "Concisus-v3/text_files";
@@ -19,7 +21,7 @@ public class FileUtils {
 
     private FileUtils(){}
 
-    public static void extract(){
+    public static Path extractDataToFile(){
 
         if(OUTPUT_PATH.toFile().exists()){
             OUTPUT_PATH.toFile().delete();
@@ -36,50 +38,46 @@ public class FileUtils {
                     }
                 }
             });
+            return OUTPUT_PATH;
         } catch (IOException e) {
             log.error(e.getMessage() != null ? e.getMessage() : "ERROR extracting text from sample texts.");
-        }
-    }
-
-    private static String getResourceFolderPath () {
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        URL url = loader.getResource(TEXT_FILES_PATH);
-        assert url != null;
-        return url.getFile();
-    }
-
-    private static void readContentFromFile(File file) throws IOException{
-
-        BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file.getAbsolutePath()), "ISO-8859-1"));
-        String strLine;
-
-        while((strLine = in.readLine()) != null){
-            writeLine(strLine);
-        }
-    }
-
-    private static Path createOutputFileInDirectory(){
-        try {
-            return Files.createFile(OUTPUT_PATH);
-        } catch (IOException e) {
-            log.error(e.getMessage() != null ? e.getMessage() : "ERROR creating output file.");
         }
         return null;
     }
 
-    private static void writeLine(String line){
+    private static String getResourceFolderPath () {
+        return FileUtilsInterface.getResourceFolderPath(TEXT_FILES_PATH);
+    }
 
-        try {
-            BufferedWriter out = new BufferedWriter(
-                    new OutputStreamWriter(
-                            new FileOutputStream(OUTPUT_PATH.toFile().getAbsolutePath(), true), StandardCharsets.ISO_8859_1));
-            out.write(line);
-            out.newLine();
-            out.flush();
-            out.close();
-        } catch (IOException e) {
-            log.error(e.getMessage() != null ? e.getMessage() : "ERROR writing line to output file.");
+    private static void readContentFromFile(File file) throws IOException{
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file.getAbsolutePath()),  ISO_8859_1));
+        String strLine;
+
+        while((strLine = in.readLine()) != null){
+            writeLineToFile(strLine, OUTPUT_PATH.toFile(), file.getName());
         }
+    }
+
+    private static Path createOutputFileInDirectory(){
+       return FileUtilsInterface.createOutputFileInDirectory(OUTPUT_PATH);
+    }
+
+    private static void writeLineToFile(String line, File file, String fileName){
+        FileUtilsInterface.writeLineWithFileNameToFile(line, file, fileName);
+    }
+
+    static Domains getDomainFromString(String raw){
+        if(raw.contains(RawDomains.AVIATION_ACCIDENT.value())){
+            return Domains.AVIATION_ACCIDENT;
+        }else if(raw.contains(RawDomains.EARTHQUAKE.value())){
+            return Domains.EARTHQUAKE;
+        }else if(raw.contains(RawDomains.TERRORIST_ATTACK.value())){
+            return Domains.TERRORIST_ATTACK;
+        }else if(raw.contains(RawDomains.TRAIN_ACCIDENT.value())){
+            return Domains.TRAIN_ACCIDENT;
+        }
+        return null;
     }
 }
 

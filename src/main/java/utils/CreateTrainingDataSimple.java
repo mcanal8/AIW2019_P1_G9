@@ -1,13 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package utils;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import utils.fileUtils.FileUtils;
+import utils.wekaUtils.WekaUtils;
+
+import java.nio.file.Path;
 
 public class CreateTrainingDataSimple {
 
@@ -22,8 +20,10 @@ public class CreateTrainingDataSimple {
                 "This App Recognizes texts belonging to the following two domain: terrorist attacks and aviation accidents");
 
         // Extracting text from text_files and merging to resultFile.txt
-        FileUtils.extract();
+        Path resultFilePath = FileUtils.extractDataToFile();
 
-        // TODO: Generating WEKA .arff file
+        // Generating WEKA .arff file
+        assert resultFilePath != null;
+        WekaUtils.generateArffFromFile(resultFilePath.toFile().getAbsoluteFile());
     }
 }
