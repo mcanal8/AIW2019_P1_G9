@@ -1,5 +1,7 @@
 package utils.classification;
 
+import utils.fileUtils.FileUtils;
+import utils.fileUtils.FileUtilsInterface;
 import weka.classifiers.Classifier;
 import weka.classifiers.bayes.NaiveBayes;
 import weka.core.Attribute;
@@ -19,18 +21,21 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static utils.wekaUtils.WekaUtils.RESULT_ARFF_FILE_NAME;
+
 public class TextClassifier {
 
+    private final static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(FileUtils.class);
+    private static final String TEXT_FILES_PATH = "testing_classifier.txt";
 
-   StringToWordVector filter;
-   Classifier naiveClassifier;
-   Instances trainInstances;
-   Instances testInstances;
-   ArrayList attributes;
-   ArrayList classValues;
+    private StringToWordVector filter;
+    private Classifier naiveClassifier;
+    private Instances trainInstances;
+    private Instances testInstances;
+    ArrayList attributes;
+    ArrayList classValues;
 
-
-   public void TextClassifier() {
+   private TextClassifier() {
 
    }
 
@@ -41,28 +46,27 @@ public class TextClassifier {
    }
 
    public String classify(String txt) throws Exception {
-        Instance instance;
-        instance=new DenseInstance(2);
 
+       Instance instance;
+       instance=new DenseInstance(2);
 
-        instance.setValue((Attribute)testInstances.attribute(0),txt);
+       instance.setValue(testInstances.attribute(0),txt);
+       instance.setValue(testInstances.attribute(1),trainInstances.attribute(trainInstances.classIndex()).value(0));
 
-        instance.setValue((Attribute)testInstances.attribute(1),trainInstances.
-                attribute(trainInstances.classIndex()).value(0));
-        testInstances.add(instance);
+       testInstances.add(instance);
 
-        Instances m_Test2 = Filter.useFilter(testInstances, filter);
-        System.out.println(testInstances.instance(0).stringValue(0));
-        double index = naiveClassifier.classifyInstance(m_Test2.instance(0));
-        System.out.println("INDEX "+index);
+       Instances m_Test2 = Filter.useFilter(testInstances, filter);
 
+       log.info(testInstances.instance(0).stringValue(0));
 
-        String className=m_Test2.classAttribute().value((int)index);
+       double index = naiveClassifier.classifyInstance(m_Test2.instance(0));
 
+       log.info("INDEX "+index);
 
+       String className=m_Test2.classAttribute().value((int)index);
 
-        System.out.println(className);
-        return className;
+       log.info(className);
+       return className;
    }
 
    public void removeInstance() {
@@ -85,20 +89,20 @@ public class TextClassifier {
         testInstances = new Instances("Rel", fvWekaAttributes, 1);
    }
 
-   public void loadTrainingInstances(String training_file) {
+   private void loadTrainingInstances(String training_file) {
 
        try {
            trainInstances = new Instances(new BufferedReader(new FileReader(training_file)));
-           System.out.println(trainInstances.numAttributes());
+           log.info(trainInstances.numAttributes());
            int lastIndex = trainInstances.numAttributes() - 1;
            trainInstances.setClassIndex(lastIndex);
            filter.setInputFormat(trainInstances);
-           trainInstances =
-                   Filter.useFilter(trainInstances, filter);
-           System.out.println(trainInstances.numAttributes());
-           naiveClassifier.buildClassifier(trainInstances);
-           ArrayList fvWekaAttributes = new ArrayList();
 
+           trainInstances = Filter.useFilter(trainInstances, filter);
+           log.info(trainInstances.numAttributes());
+           naiveClassifier.buildClassifier(trainInstances);
+
+           ArrayList fvWekaAttributes = new ArrayList();
 
        } catch (FileNotFoundException ex) {
            Logger.getLogger(TextClassifier.class.getName()).log(Level.SEVERE, null, ex);
@@ -113,16 +117,10 @@ public class TextClassifier {
    public static void main(String[] args) {
        try {
 
-          // String trainFile="C:\\work\\horacio\\teaching\\AIW-2018\\material-2018\\practicas\\P1\\AWI2017P1\\resources\\DATA_AIW\\instances_AIW_2018.arff";
-           String trainFile="./resources/data_classifier.arff";
-           String testTXTFile="./resources/testing_classifier.txt";
-
-           TextClassifier classifier=new TextClassifier();
+           TextClassifier classifier = new TextClassifier();
            classifier.initClassifier();
-           classifier.loadTrainingInstances(trainFile);
+           classifier.loadTrainingInstances(RESULT_ARFF_FILE_NAME);
            classifier.createTestInstances();
-
-
            String txt;
            String topic;
 
@@ -147,16 +145,13 @@ public class TextClassifier {
            /**
             *  Batch testing of the classifier
             */
-           BufferedReader reader=new BufferedReader(new FileReader(testTXTFile));
+           BufferedReader reader=new BufferedReader(new FileReader(FileUtilsInterface.getResourceFolderPath(TEXT_FILES_PATH)));
            while((txt=reader.readLine())!=null) {
                System.out.println("TEXT >>> "+txt);
                topic=classifier.classify(txt);
                System.out.println("It is about "+topic);
                classifier.removeInstance();
-
            }
-
-
        } catch (Exception ex) {
            Logger.getLogger(TextClassifier.class.getName()).log(Level.SEVERE, null, ex);
        }

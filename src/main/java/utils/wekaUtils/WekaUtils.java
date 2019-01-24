@@ -4,7 +4,6 @@ import enums.Domains;
 import enums.WekaAnnotations;
 import enums.WekaAttributesTypes;
 import org.apache.log4j.Logger;
-import org.json.JSONObject;
 import utils.CreateTrainingDataSimple;
 import utils.fileUtils.FileUtilsInterface;
 
@@ -19,7 +18,7 @@ import static java.nio.charset.StandardCharsets.ISO_8859_1;
 public class WekaUtils implements FileUtilsInterface{
 
     private final static Logger log = Logger.getLogger(CreateTrainingDataSimple.class);
-    private static final String RESULT_ARFF_FILE_NAME = System.getProperty("user.dir") + "/resultArffFile.arff";
+    public static final String RESULT_ARFF_FILE_NAME = System.getProperty("user.dir") + "/data_classifier.arff";
     private static final Path OUTPUT_PATH = Paths.get(RESULT_ARFF_FILE_NAME);
     private static final String RELATION_NAME = "category";
 
@@ -29,8 +28,6 @@ public class WekaUtils implements FileUtilsInterface{
             OUTPUT_PATH.toFile().delete();
         }
         createOutputFileInDirectory();
-
-
         buildRelationHeader(RELATION_NAME);
         buildAttributes();
         buildDataFromFile(file);

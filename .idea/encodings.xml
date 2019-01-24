@@ -2,5 +2,6 @@
 <project version="4">
   <component name="Encoding" addBOMForNewFiles="with NO BOM">
     <file url="file://$PROJECT_DIR$/resultFile.txt" charset="ISO-8859-1" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/testing_classifier.txt" charset="ISO-8859-1" />
   </component>
 </project>
