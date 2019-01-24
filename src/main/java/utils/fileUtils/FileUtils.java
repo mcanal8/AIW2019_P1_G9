@@ -2,6 +2,7 @@ package utils.fileUtils;
 
 import enums.Domains;
 import enums.RawDomains;
+import org.apache.commons.lang.SystemUtils;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -28,7 +29,13 @@ public class FileUtils implements FileUtilsInterface{
         }
         createOutputFileInDirectory();
 
-        try(Stream<Path> paths = Files.walk(Paths.get(getResourceFolderPath()))) {
+        String url = getResourceFolderPath();
+
+        if(SystemUtils.IS_OS_WINDOWS){
+            url = url.replaceFirst("/","");
+        }
+
+        try(Stream<Path> paths = Files.walk(Paths.get(url))) {
             paths.forEach(filePath -> {
                 if (filePath.toFile().isFile()) {
                     try {
