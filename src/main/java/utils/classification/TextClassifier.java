@@ -1,5 +1,9 @@
 package utils.classification;
 
+import gate.Corpus;
+import gate.Document;
+import gate.Factory;
+import utils.CallMyGATEApp;
 import utils.fileUtils.FileUtils;
 import utils.fileUtils.FileUtilsInterface;
 import weka.classifiers.Classifier;
@@ -17,6 +21,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Scanner;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,13 +40,12 @@ public class TextClassifier {
     ArrayList attributes;
     ArrayList classValues;
 
-   private TextClassifier() {
+   public TextClassifier() {
 
    }
 
    public void initClassifier() {
         filter = new StringToWordVector();
-
         naiveClassifier = new NaiveBayes();
    }
 
@@ -73,6 +77,22 @@ public class TextClassifier {
        testInstances.delete(0);
    }
 
+
+    public void createTestInstancesFromText(String text) {
+        ArrayList fvClassVal = new ArrayList();
+        Enumeration enu = trainInstances.attribute(trainInstances.classIndex()).enumerateValues();
+        while(enu.hasMoreElements()) {
+            text=(String)enu.nextElement();
+            fvClassVal.add(text);
+        }
+        Attribute classAttribute = new Attribute("topic", fvClassVal);
+        ArrayList fvWekaAttributes=new ArrayList();
+        Attribute textAttribute = new Attribute("text",(Vector) null);
+        fvWekaAttributes.add(textAttribute);
+        fvWekaAttributes.add(classAttribute);
+        testInstances = new Instances("Rel", fvWekaAttributes, 1);
+    }
+
    public void createTestInstances() {
         ArrayList fvClassVal = new ArrayList();
         String value;
@@ -89,20 +109,20 @@ public class TextClassifier {
         testInstances = new Instances("Rel", fvWekaAttributes, 1);
    }
 
-   private void loadTrainingInstances(String training_file) {
+   public void loadTrainingInstances(String training_file) {
 
        try {
            trainInstances = new Instances(new BufferedReader(new FileReader(training_file)));
-           log.info(trainInstances.numAttributes());
            int lastIndex = trainInstances.numAttributes() - 1;
            trainInstances.setClassIndex(lastIndex);
            filter.setInputFormat(trainInstances);
 
            trainInstances = Filter.useFilter(trainInstances, filter);
-           log.info(trainInstances.numAttributes());
            naiveClassifier.buildClassifier(trainInstances);
 
            ArrayList fvWekaAttributes = new ArrayList();
+
+           log.info("Training the Text Classifier.....done!");
 
        } catch (FileNotFoundException ex) {
            Logger.getLogger(TextClassifier.class.getName()).log(Level.SEVERE, null, ex);
@@ -155,8 +175,37 @@ public class TextClassifier {
        } catch (Exception ex) {
            Logger.getLogger(TextClassifier.class.getName()).log(Level.SEVERE, null, ex);
        }
+
    }
 
 
+   public static void analyze(TextClassifier classifier, CallMyGATEApp myanalyser) throws Exception{
+       String txt;
+       String topic;
+       String language;
+
+       Scanner scanner = new Scanner(System.in);
+       System.out.print("READY FOR YOUR TEXT> ");
+       txt=scanner.nextLine();
+
+       while(!txt.equalsIgnoreCase("quit")) {
+           Corpus corpus= Factory.newCorpus("");
+           Document document = Factory.newDocument(txt);
+           corpus.add(document);
+           myanalyser.setCorpus(corpus);
+           myanalyser.executeMyGapp();
+           language = document.getFeatures().get("lang").toString();
+           classifier.createTestInstancesFromText(txt);
+           topic=classifier.classify(txt);
+           System.out.println("YOUR TEXT IS ABOUT " + topic + " IN " + language);
+
+           System.out.println("CALLING THE EXTRACTION SYSTEM.....");
+
+           classifier.removeInstance();
+           System.out.print("READY FOR YOUR TEXT> ");
+           txt=scanner.nextLine();
+       }
+
+   }
 
 }

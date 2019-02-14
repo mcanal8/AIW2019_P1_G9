@@ -52,7 +52,7 @@ public class FileUtils implements FileUtilsInterface{
         return null;
     }
 
-    private static String getResourceFolderPath () {
+    public static String getResourceFolderPath () {
         return FileUtilsInterface.getResourceFolderPath(TEXT_FILES_PATH);
     }
 
