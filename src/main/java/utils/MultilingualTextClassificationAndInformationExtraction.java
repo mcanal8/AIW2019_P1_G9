@@ -36,11 +36,6 @@ public class MultilingualTextClassificationAndInformationExtraction {
 
         Path arffFile = WekaUtils.generateArffFromFile(resultFilePath.toFile().getAbsoluteFile());
 
-        // Getting instances from ARFF File
-        //Instances dataTrain = WekaUtils.getInstancesFromFile(arffFile.toString());
-        // Getting test instances in order to classify them
-        //Instances dataTest = WekaUtils.getInstancesFromFile("/home/victor/IdeaProjects/AIW2019_P1_G9/src/main/resources/testing_classifier.txt");
-
         TextClassifier classifier = new TextClassifier();
         classifier.initClassifier();
         classifier.loadTrainingInstances(arffFile.toString());
@@ -64,7 +59,6 @@ public class MultilingualTextClassificationAndInformationExtraction {
             CallMyGATEApp ieSpanish = new CallMyGATEApp();
             ieSpanish.loadMyGappSpanish("/home/victor/IdeaProjects/AIW2019_P1_G9/src/main/java/gapps/IE_AIRPLANE_ES.gapp");
             log.info("Loading IE System for terrorist attacks (Spanish).....done!");
-
 
             analyze(classifier, myanalyser, ieEnglish, ieSpanish);
 

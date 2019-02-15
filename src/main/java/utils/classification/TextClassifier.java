@@ -1,6 +1,10 @@
 package utils.classification;
 
-import gate.*;
+import enums.Domains;
+import extraction.*;
+import gate.Corpus;
+import gate.Document;
+import gate.Factory;
 import utils.CallMyGATEApp;
 import utils.fileUtils.FileUtils;
 import weka.classifiers.Classifier;
@@ -13,18 +17,18 @@ import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.StringToWordVector;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Scanner;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
 public class TextClassifier {
 
-    private final static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(FileUtils.class);
-    private static final String TEXT_FILES_PATH = "testing_classifier.txt";
+    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(FileUtils.class);
 
     private StringToWordVector filter;
     private Classifier naiveClassifier;
@@ -101,10 +105,6 @@ public class TextClassifier {
 
            log.info("Training the Text Classifier.....done!");
 
-       } catch (FileNotFoundException ex) {
-           Logger.getLogger(TextClassifier.class.getName()).log(Level.SEVERE, null, ex);
-       } catch (IOException ex) {
-           Logger.getLogger(TextClassifier.class.getName()).log(Level.SEVERE, null, ex);
        } catch (Exception ex) {
            Logger.getLogger(TextClassifier.class.getName()).log(Level.SEVERE, null, ex);
        }
@@ -113,11 +113,11 @@ public class TextClassifier {
 
    public static void analyze(TextClassifier classifier, CallMyGATEApp myanalyser, CallMyGATEApp ieEnglish, CallMyGATEApp ieSpanish) throws Exception{
        String txt;
-       String topic;
+       Domains topic;
        String language;
 
        Scanner scanner = new Scanner(System.in);
-       System.out.print("READY FOR YOUR TEXT> ");
+       log.info("READY FOR YOUR TEXT> ");
        txt=scanner.nextLine();
 
        while(!txt.equalsIgnoreCase("quit")) {
@@ -128,117 +128,49 @@ public class TextClassifier {
            myanalyser.executeMyGappFirst();
            language = document.getFeatures().get("lang").toString();
            classifier.createTestInstancesFromText(txt);
-           topic=classifier.classify(txt);
-           System.out.println("YOUR TEXT IS ABOUT " + topic + " IN " + language);
+           topic = Domains.fromValue(classifier.classify(txt));
+           log.info("YOUR TEXT IS ABOUT " + topic + " IN " + language);
 
-           System.out.println("CALLING THE EXTRACTION SYSTEM.....");
+           log.info("CALLING THE EXTRACTION SYSTEM.....");
 
            switch (language){
                case "spanish":
                    ieSpanish.setCorpusSpanish(corpus);
                    ieSpanish.executeMyGappSpanish();
-                   extractSystemSpanish(document);
                    break;
                case "english":
                    ieEnglish.setCorpusEnglish(corpus);
                    ieEnglish.executeMyGappEnglish();
-                   extractSystemEnglish(document);
                    break;
                default:
-                   ieEnglish.setCorpusEnglish(corpus);
-                   ieEnglish.executeMyGappEnglish();
-                   break;
+                   return;
            }
 
-           System.out.println("Hey");
+           DomainExtractor extractor;
+
+           assert topic != null;
+           switch (topic) {
+               case TRAIN_ACCIDENT:
+                   extractor = new TrainAccidentExtractor(txt, document.getAnnotations());
+                   break;
+               case TERRORIST_ATTACK:
+                   extractor = new TerroristAttackExtractor(txt, document.getAnnotations());
+                   break;
+               case EARTHQUAKE:
+                   extractor = new EarthquakeExtractor(txt, document.getAnnotations());
+                   break;
+               case AVIATION_ACCIDENT:
+                   extractor = new AviationAccidentExtractor(txt, document.getAnnotations());
+                   break;
+               default:
+                   return;
+           }
+
+           extractor.extract();
+
            classifier.removeInstance();
-           System.out.print("READY FOR YOUR TEXT> ");
+           log.info("READY FOR YOUR TEXT> ");
            txt=scanner.nextLine();
        }
-
    }
-
-   private static void extractSystemEnglish(Document document) {
-       extractInfo(document);
-
-//       AnnotationSet annotations_english = document.getAnnotations();
-//
-//       for (Annotation annotation : annotations_english) {
-//           String type = annotation.getType();
-//           FeatureMap features =annotation.getFeatures();
-//           System.out.println(type + features.toString());
-//       }
-   }
-
-    private static void extractSystemSpanish(Document document) {
-        extractInfo(document);
-
-//        AnnotationSet annotations_spanish = document.getAnnotations();
-//
-//        for (Annotation annotation : annotations_spanish) {
-//            String type = annotation.getType();
-//            FeatureMap features =annotation.getFeatures();
-//            System.out.println(type + features.toString());
-//        }
-    }
-
-    private static void extractInfo(Document doc) {
-        // get all annotations in default annotation Set
-        AnnotationSet defaultAnnotations = doc.getAnnotations();
-
-        // select annotations of type NE
-        AnnotationSet mentions = defaultAnnotations.get("Mention");
-        AnnotationSet lookUps = defaultAnnotations.get("Lookup");
-
-        // variable to hold each annotation to be processed
-        Annotation mention;
-        Annotation lookUp;
-
-        // start and end of annotations in the text
-        Long start, end;
-
-        // features of annotation
-        FeatureMap fm;
-
-        // document content
-        String dc = doc.getContent().toString();
-
-        // iterate on each annotation
-
-        Iterator<Annotation> ite = mentions.iterator();
-
-        while (ite.hasNext()) {
-
-            // next NE
-            mention = ite.next();
-
-            // get features
-            fm = mention.getFeatures();
-
-            // get start end offset
-            start = mention.getStartNode().getOffset();
-            end = mention.getEndNode().getOffset();
-
-            // get feature type of NE
-            System.out.println(fm.get("type") + "=" + dc.substring(start.intValue(), end.intValue()));
-        }
-
-        Iterator<Annotation> ite_lookup = lookUps.iterator();
-
-        while (ite_lookup.hasNext()) {
-
-            // next NE
-            lookUp = ite_lookup.next();
-
-            // get features
-            fm = lookUp.getFeatures();
-
-            // get start end offset
-            start = lookUp.getStartNode().getOffset();
-            end = lookUp.getEndNode().getOffset();
-
-            // get feature type of NE
-            System.out.println(fm.get("type") + "=" + dc.substring(start.intValue(), end.intValue()));
-        }
-    }
 }
