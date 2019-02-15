@@ -1,11 +1,8 @@
 package utils.classification;
 
-import gate.Corpus;
-import gate.Document;
-import gate.Factory;
+import gate.*;
 import utils.CallMyGATEApp;
 import utils.fileUtils.FileUtils;
-import utils.fileUtils.FileUtilsInterface;
 import weka.classifiers.Classifier;
 import weka.classifiers.bayes.NaiveBayes;
 import weka.core.Attribute;
@@ -19,14 +16,10 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Scanner;
-import java.util.Vector;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static utils.wekaUtils.WekaUtils.RESULT_ARFF_FILE_NAME;
 
 public class TextClassifier {
 
@@ -93,22 +86,6 @@ public class TextClassifier {
         testInstances = new Instances("Rel", fvWekaAttributes, 1);
     }
 
-   public void createTestInstances() {
-        ArrayList fvClassVal = new ArrayList();
-        String value;
-        Enumeration enu = trainInstances.attribute(trainInstances.classIndex()).enumerateValues();
-        while(enu.hasMoreElements()) {
-            value=(String)enu.nextElement();
-            fvClassVal.add(value);
-        }
-        Attribute classAttribute = new Attribute("topic", fvClassVal);
-        ArrayList fvWekaAttributes=new ArrayList();
-        Attribute textAttribute = new Attribute("text",(Vector) null);
-        fvWekaAttributes.add(textAttribute);
-        fvWekaAttributes.add(classAttribute);
-        testInstances = new Instances("Rel", fvWekaAttributes, 1);
-   }
-
    public void loadTrainingInstances(String training_file) {
 
        try {
@@ -134,52 +111,7 @@ public class TextClassifier {
    }
 
 
-   public static void main(String[] args) {
-       try {
-
-           TextClassifier classifier = new TextClassifier();
-           classifier.initClassifier();
-           classifier.loadTrainingInstances(RESULT_ARFF_FILE_NAME);
-           classifier.createTestInstances();
-           String txt;
-           String topic;
-
-           /**
-            *  Iterative testing the classifier
-            */
-
-           /*
-           Scanner scanner = new Scanner(System.in);
-           System.out.print("YOUR TEXT>>> ");
-           txt=scanner.nextLine();
-           while(!txt.equalsIgnoreCase("quit")) {
-               topic=classifier.classify(txt);
-               System.out.println("It is about "+topic);
-               classifier.removeInstance();
-               System.out.print("YOUR TEXT>>> ");
-               txt=scanner.nextLine();
-            }
-          */
-
-
-           /**
-            *  Batch testing of the classifier
-            */
-           BufferedReader reader=new BufferedReader(new FileReader(FileUtilsInterface.getResourceFolderPath(TEXT_FILES_PATH)));
-           while((txt=reader.readLine())!=null) {
-               System.out.println("TEXT >>> "+txt);
-               topic=classifier.classify(txt);
-               System.out.println("It is about "+topic);
-               classifier.removeInstance();
-           }
-       } catch (Exception ex) {
-           Logger.getLogger(TextClassifier.class.getName()).log(Level.SEVERE, null, ex);
-       }
-
-   }
-
-
-   public static void analyze(TextClassifier classifier, CallMyGATEApp myanalyser) throws Exception{
+   public static void analyze(TextClassifier classifier, CallMyGATEApp myanalyser, CallMyGATEApp ieEnglish, CallMyGATEApp ieSpanish) throws Exception{
        String txt;
        String topic;
        String language;
@@ -192,8 +124,8 @@ public class TextClassifier {
            Corpus corpus= Factory.newCorpus("");
            Document document = Factory.newDocument(txt);
            corpus.add(document);
-           myanalyser.setCorpus(corpus);
-           myanalyser.executeMyGapp();
+           myanalyser.setCorpusFirst(corpus);
+           myanalyser.executeMyGappFirst();
            language = document.getFeatures().get("lang").toString();
            classifier.createTestInstancesFromText(txt);
            topic=classifier.classify(txt);
@@ -201,6 +133,24 @@ public class TextClassifier {
 
            System.out.println("CALLING THE EXTRACTION SYSTEM.....");
 
+           switch (language){
+               case "spanish":
+                   ieSpanish.setCorpusSpanish(corpus);
+                   ieSpanish.executeMyGappSpanish();
+                   extractSystemSpanish(document);
+                   break;
+               case "english":
+                   ieEnglish.setCorpusEnglish(corpus);
+                   ieEnglish.executeMyGappEnglish();
+                   extractSystemEnglish(document);
+                   break;
+               default:
+                   ieEnglish.setCorpusEnglish(corpus);
+                   ieEnglish.executeMyGappEnglish();
+                   break;
+           }
+
+           System.out.println("Hey");
            classifier.removeInstance();
            System.out.print("READY FOR YOUR TEXT> ");
            txt=scanner.nextLine();
@@ -208,4 +158,87 @@ public class TextClassifier {
 
    }
 
+   private static void extractSystemEnglish(Document document) {
+       extractInfo(document);
+
+//       AnnotationSet annotations_english = document.getAnnotations();
+//
+//       for (Annotation annotation : annotations_english) {
+//           String type = annotation.getType();
+//           FeatureMap features =annotation.getFeatures();
+//           System.out.println(type + features.toString());
+//       }
+   }
+
+    private static void extractSystemSpanish(Document document) {
+        extractInfo(document);
+
+//        AnnotationSet annotations_spanish = document.getAnnotations();
+//
+//        for (Annotation annotation : annotations_spanish) {
+//            String type = annotation.getType();
+//            FeatureMap features =annotation.getFeatures();
+//            System.out.println(type + features.toString());
+//        }
+    }
+
+    private static void extractInfo(Document doc) {
+        // get all annotations in default annotation Set
+        AnnotationSet defaultAnnotations = doc.getAnnotations();
+
+        // select annotations of type NE
+        AnnotationSet mentions = defaultAnnotations.get("Mention");
+        AnnotationSet lookUps = defaultAnnotations.get("Lookup");
+
+        // variable to hold each annotation to be processed
+        Annotation mention;
+        Annotation lookUp;
+
+        // start and end of annotations in the text
+        Long start, end;
+
+        // features of annotation
+        FeatureMap fm;
+
+        // document content
+        String dc = doc.getContent().toString();
+
+        // iterate on each annotation
+
+        Iterator<Annotation> ite = mentions.iterator();
+
+        while (ite.hasNext()) {
+
+            // next NE
+            mention = ite.next();
+
+            // get features
+            fm = mention.getFeatures();
+
+            // get start end offset
+            start = mention.getStartNode().getOffset();
+            end = mention.getEndNode().getOffset();
+
+            // get feature type of NE
+            System.out.println(fm.get("type") + "=" + dc.substring(start.intValue(), end.intValue()));
+        }
+
+        Iterator<Annotation> ite_lookup = lookUps.iterator();
+
+        while (ite_lookup.hasNext()) {
+
+            // next NE
+            lookUp = ite_lookup.next();
+
+            // get features
+            fm = lookUp.getFeatures();
+
+            // get start end offset
+            start = lookUp.getStartNode().getOffset();
+            end = lookUp.getEndNode().getOffset();
+
+            // get feature type of NE
+            System.out.println(fm.get("type") + "=" + dc.substring(start.intValue(), end.intValue()));
+        }
+    }
 }

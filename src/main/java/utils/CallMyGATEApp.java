@@ -7,6 +7,7 @@ import gate.Gate;
 import gate.creole.ConditionalSerialAnalyserController;
 import gate.creole.ExecutionException;
 import gate.creole.ResourceInstantiationException;
+import gate.creole.SerialAnalyserController;
 import gate.persist.PersistenceException;
 import gate.util.GateException;
 import gate.util.persistence.PersistenceManager;
@@ -24,28 +25,61 @@ import java.util.logging.Logger;
 public class CallMyGATEApp {
     
   //  public  CorpusController application;
-    public ConditionalSerialAnalyserController application;
+    public ConditionalSerialAnalyserController applicationEnglish;
+    public ConditionalSerialAnalyserController firstApplication;
+    public SerialAnalyserController applicationSpanish;
+
     public CallMyGATEApp() 
               {
                   super();
               }
-    
-    public void loadMyGapp(String pathToGapp) throws IOException, ResourceInstantiationException, PersistenceException {
+
+    public void loadMyGappFirst(String pathToGapp) throws IOException, ResourceInstantiationException, PersistenceException {
+
+        // load the GAPP
+        this.firstApplication = (ConditionalSerialAnalyserController) PersistenceManager.loadObjectFromFile(new File(pathToGapp));
+    }
+
+    public void loadMyGappEnglish(String pathToGapp) throws IOException, ResourceInstantiationException, PersistenceException {
         
             // load the GAPP 
-             this.application =
-            (ConditionalSerialAnalyserController)
-                            PersistenceManager.loadObjectFromFile(new File(pathToGapp));
+             this.applicationEnglish = (ConditionalSerialAnalyserController) PersistenceManager.loadObjectFromFile(new File(pathToGapp));
+    }
+
+    public void loadMyGappSpanish(String pathToGapp) throws IOException, ResourceInstantiationException, PersistenceException {
+
+        // load the GAPP
+        this.applicationSpanish = (SerialAnalyserController) PersistenceManager.loadObjectFromFile(new File(pathToGapp));
+    }
+
+    public void setCorpusFirst(Corpus c) {
+        this.firstApplication.setCorpus(c);
+
     }
     
-    public void setCorpus(Corpus c) {
-        this.application.setCorpus(c);
+    public void setCorpusEnglish(Corpus c) {
+        this.applicationEnglish.setCorpus(c);
         
     }
+
+    public void setCorpusSpanish(Corpus c) {
+        this.applicationSpanish.setCorpus(c);
+
+    }
+
+    public void executeMyGappFirst() throws ExecutionException {
+
+        this.firstApplication.execute();
+    }
     
-    public void executeMyGapp() throws ExecutionException {
+    public void executeMyGappEnglish() throws ExecutionException {
         
-        this.application.execute();
+        this.applicationEnglish.execute();
+    }
+
+    public void executeMyGappSpanish() throws ExecutionException {
+
+        this.applicationSpanish.execute();
     }
     
     
@@ -54,7 +88,7 @@ public class CallMyGATEApp {
         if(Gate.getGateHome() == null)
             Gate.setGateHome(new File("/home/victor/GATE_Developer_8.0"));
         if(Gate.getPluginsHome() == null)
-            Gate.setPluginsHome(new File("/home/victor/GATE_Developer_8.0/plugins"));
+            Gate.setPluginsHome(new File("/home/victor/IdeaProjects/AIW2019_P1_G9/src/plugins"));
 
         try {
             // initialize GATE
@@ -64,7 +98,7 @@ public class CallMyGATEApp {
             CallMyGATEApp myanalyser=new CallMyGATEApp();
            
            // load the application
-            myanalyser.loadMyGapp("/home/victor/IdeaProjects/AIW2019_P1_G9/src/main/java/gapps/MyNLPApp.gapp");
+            myanalyser.loadMyGappEnglish("/home/victor/IdeaProjects/AIW2019_P1_G9/src/main/java/gapps/MyNLPApp.gapp");
           
            // create a GATE corpus
             Corpus corpus=Factory.newCorpus("");
@@ -77,7 +111,7 @@ public class CallMyGATEApp {
             
             corpus.add(es_document);
             // pass corpus to app
-            myanalyser.setCorpus(corpus);
+            myanalyser.setCorpusFirst(corpus);
           
             
             // show annotations before call for English doc
@@ -89,7 +123,7 @@ public class CallMyGATEApp {
             System.out.println(es_document.getAnnotations());
             
             // execute app
-            myanalyser.executeMyGapp();
+            myanalyser.executeMyGappFirst();
         
             // show annotations after call
             System.out.println(">>>> annotations after call ENGLISH<<<<<");
@@ -102,9 +136,7 @@ public class CallMyGATEApp {
             // release resources used for documents
             Factory.deleteResource(en_document);
             Factory.deleteResource(es_document);
-            
-            
-            
+
         } catch(GateException ge) {
             ge.printStackTrace();
         } catch (IOException ex) {

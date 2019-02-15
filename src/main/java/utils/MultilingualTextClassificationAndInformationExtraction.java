@@ -54,19 +54,19 @@ public class MultilingualTextClassificationAndInformationExtraction {
 
             Gate.init();
             CallMyGATEApp myanalyser=new CallMyGATEApp();
-            myanalyser.loadMyGapp("/home/victor/IdeaProjects/AIW2019_P1_G9/src/main/java/gapps/MyNLPApp.gapp");
+            myanalyser.loadMyGappFirst("/home/victor/IdeaProjects/AIW2019_P1_G9/src/main/java/gapps/MyNLPApp.gapp");
             log.info("Loading the Multilingual Text Analyzer.....done!");
 
-            CallMyGATEApp IE_English = new CallMyGATEApp();
-            IE_English.loadMyGapp("PATH_HERE");
+            CallMyGATEApp ieEnglish = new CallMyGATEApp();
+            ieEnglish.loadMyGappEnglish("/home/victor/IdeaProjects/AIW2019_P1_G9/src/main/java/gapps/IE_AIRPLANE_EN.gapp");
             log.info("Loading IE System for aviation accidents (English).....done!");
 
-            CallMyGATEApp IE_Spanish = new CallMyGATEApp();
-            IE_Spanish.loadMyGapp("PATH_HERE");
+            CallMyGATEApp ieSpanish = new CallMyGATEApp();
+            ieSpanish.loadMyGappSpanish("/home/victor/IdeaProjects/AIW2019_P1_G9/src/main/java/gapps/IE_AIRPLANE_ES.gapp");
             log.info("Loading IE System for terrorist attacks (Spanish).....done!");
 
 
-            analyze(classifier, myanalyser);
+            analyze(classifier, myanalyser, ieEnglish, ieSpanish);
 
         } catch (GateException e) {
             e.printStackTrace();
