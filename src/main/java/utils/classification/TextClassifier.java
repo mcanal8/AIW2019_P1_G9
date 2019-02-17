@@ -165,6 +165,7 @@ public class TextClassifier {
 
                classifier.removeInstance();
                Factory.deleteResource(document);
+               log.info("....");
                log.info("READY FOR YOUR TEXT> ");
                txt=scanner.nextLine();
            } else {
@@ -175,5 +176,8 @@ public class TextClassifier {
                txt=scanner.nextLine();
            }
        }
+
+       log.info("GOOD BYE!");
+       log.info("****");
    }
 }
