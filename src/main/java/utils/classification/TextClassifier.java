@@ -1,6 +1,7 @@
 package utils.classification;
 
 import enums.Domains;
+import enums.Languages;
 import extraction.*;
 import gate.Corpus;
 import gate.Document;
@@ -110,11 +111,10 @@ public class TextClassifier {
        }
    }
 
-
    public static void analyze(TextClassifier classifier, CallMyGATEApp myanalyser, CallMyGATEApp ieEnglish, CallMyGATEApp ieSpanish) throws Exception{
        String txt;
        Domains topic;
-       String language;
+       Languages language;
 
        Scanner scanner = new Scanner(System.in);
        log.info("READY FOR YOUR TEXT> ");
@@ -124,53 +124,56 @@ public class TextClassifier {
            Corpus corpus= Factory.newCorpus("");
            Document document = Factory.newDocument(txt);
            corpus.add(document);
-           myanalyser.setCorpusFirst(corpus);
-           myanalyser.executeMyGappFirst();
-           language = document.getFeatures().get("lang").toString();
+           myanalyser.setCorpus(corpus);
+           myanalyser.executeMyGapp();
+           language = Languages.fromValue(document.getFeatures().get("lang").toString());
            classifier.createTestInstancesFromText(txt);
            topic = Domains.fromValue(classifier.classify(txt));
-           log.info("YOUR TEXT IS ABOUT " + topic + " IN " + language);
+           assert language != null;
+           log.info("YOUR TEXT IS ABOUT " + topic + " IN " + language.value());
 
-           log.info("CALLING THE EXTRACTION SYSTEM.....");
+           if((language.equals(Languages.SPANISH) && topic == Domains.TERRORIST_ATTACK) || (language.equals(Languages.ENGLISH) && topic == Domains.AVIATION_ACCIDENT)) {
+               log.info("CALLING THE EXTRACTION SYSTEM.....");
 
-           switch (language){
-               case "spanish":
-                   ieSpanish.setCorpusSpanish(corpus);
-                   ieSpanish.executeMyGappSpanish();
-                   break;
-               case "english":
-                   ieEnglish.setCorpusEnglish(corpus);
-                   ieEnglish.executeMyGappEnglish();
-                   break;
-               default:
-                   return;
+               DomainExtractor extractor;
+
+               switch (language){
+                   case SPANISH:
+                       ieSpanish.setCorpus(corpus);
+                       ieSpanish.executeMyGapp();
+                       break;
+                   case ENGLISH:
+                       ieEnglish.setCorpus(corpus);
+                       ieEnglish.executeMyGapp();
+                       break;
+                   default:
+                       return;
+               }
+
+               switch (topic) {
+                   case TERRORIST_ATTACK:
+                       extractor = new TerroristAttackExtractor(language, txt, document.getAnnotations());
+                       break;
+                   case AVIATION_ACCIDENT:
+                       extractor = new AviationAccidentExtractor(language, txt, document.getAnnotations());
+                       break;
+                   default:
+                       return;
+               }
+
+               extractor.extract();
+
+               classifier.removeInstance();
+               Factory.deleteResource(document);
+               log.info("READY FOR YOUR TEXT> ");
+               txt=scanner.nextLine();
+           } else {
+               classifier.removeInstance();
+               Factory.deleteResource(document);
+               log.error("Sorry, I can't process the text.");
+               log.info("READY FOR YOUR TEXT> ");
+               txt=scanner.nextLine();
            }
-
-           DomainExtractor extractor;
-
-           assert topic != null;
-           switch (topic) {
-               case TRAIN_ACCIDENT:
-                   extractor = new TrainAccidentExtractor(txt, document.getAnnotations());
-                   break;
-               case TERRORIST_ATTACK:
-                   extractor = new TerroristAttackExtractor(txt, document.getAnnotations());
-                   break;
-               case EARTHQUAKE:
-                   extractor = new EarthquakeExtractor(txt, document.getAnnotations());
-                   break;
-               case AVIATION_ACCIDENT:
-                   extractor = new AviationAccidentExtractor(txt, document.getAnnotations());
-                   break;
-               default:
-                   return;
-           }
-
-           extractor.extract();
-
-           classifier.removeInstance();
-           log.info("READY FOR YOUR TEXT> ");
-           txt=scanner.nextLine();
        }
    }
 }

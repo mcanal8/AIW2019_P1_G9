@@ -1,0 +1,8 @@
+1 #numTrainingDocs
+0 #numClasses
+88 #numNullLabelInstances
+9000726 #totalFeatures
+/home/victor/IdeaProjects/AIW2019_P1_G9/src/main/resources/configs/attack/spanish/savedFiles/learnedModels.save #modelFile
+SVMLibSvmJava #learnerName
+null #learnerExecutable
+ -c 0.7 -t 0 -m 100 -tau 0.6   #learnerParams

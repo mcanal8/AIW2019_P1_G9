@@ -4,7 +4,7 @@ import enums.Domains;
 import enums.WekaAnnotations;
 import enums.WekaAttributesTypes;
 import org.apache.log4j.Logger;
-import utils.MultilingualTextClassificationAndInformationExtraction;
+import utils.MultilingualTCAndIE;
 import utils.fileUtils.FileUtilsInterface;
 import weka.core.Instances;
 import weka.core.converters.ArffLoader;
@@ -19,7 +19,7 @@ import static java.nio.charset.StandardCharsets.ISO_8859_1;
 
 public class WekaUtils implements FileUtilsInterface{
 
-    private final static Logger log = Logger.getLogger(MultilingualTextClassificationAndInformationExtraction.class);
+    private static final Logger log = Logger.getLogger(MultilingualTCAndIE.class);
     public static final String RESULT_ARFF_FILE_NAME = System.getProperty("user.dir") + "/data_classifier.arff";
     private static final Path OUTPUT_PATH = Paths.get(RESULT_ARFF_FILE_NAME);
     private static final String RELATION_NAME = "category";
