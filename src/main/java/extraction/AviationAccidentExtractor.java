@@ -32,42 +32,42 @@ public class AviationAccidentExtractor extends DomainExtractor {
     }
 
     private Map<String, String> extractAirline() {
-        List<String> majorTypesSpa = Collections.singletonList("organization");
-        return extractCustomAnnotation(annotations, text, "Lookup", majorTypesSpa);
+        List<String> majorTypesSpa = Collections.singletonList("Airline");
+        return extractCustomAnnotation(annotations, text, "Mention", majorTypesSpa);
     }
 
     private Map<String, String> extractDateOfAccident() {
-        List<String> majorTypesSpa = Collections.singletonList("date");
-        return extractCustomAnnotation(annotations, text, "Lookup", majorTypesSpa);
+        List<String> majorTypesSpa = Collections.singletonList("DateOfAccident");
+        return extractCustomAnnotation(annotations, text, "Mention", majorTypesSpa);
     }
 
     private Map<String, String> extractFlightNumber() {
-        List<String> majorTypesSpa = Collections.singletonList("Tiempo");
-        return extractCustomAnnotation(annotations, text, "Lookup", majorTypesSpa);
+        List<String> majorTypesSpa = Collections.singletonList("FlightNumber");
+        return extractCustomAnnotation(annotations, text, "Mention", majorTypesSpa);
     }
 
     private Map<String, String> extractNumberOfVictims() {
-        List<String> majorTypesSpa = Collections.singletonList("Tiempo");
-        return extractCustomAnnotation(annotations, text, "Lookup", majorTypesSpa);
+        List<String> majorTypesSpa = Collections.singletonList("NumberOfVictims");
+        return extractCustomAnnotation(annotations, text, "Mention", majorTypesSpa);
     }
 
     private Map<String, String> extractPlace() {
-        List<String> majorTypesSpa = Collections.singletonList("location");
-        return extractCustomAnnotation(annotations, text, "Lookup", majorTypesSpa);
+        List<String> majorTypesSpa = Collections.singletonList("Place");
+        return extractCustomAnnotation(annotations, text, "Mention", majorTypesSpa);
     }
 
     private Map<String, String> extractTypeOfAccident() {
-        List<String> majorTypesSpa = Collections.singletonList("Tiempo");
-        return extractCustomAnnotation(annotations, text, "Lookup", majorTypesSpa);
+        List<String> majorTypesSpa = Collections.singletonList("TypeOfAccident");
+        return extractCustomAnnotation(annotations, text, "Mention", majorTypesSpa);
     }
 
     private Map<String, String> extractTypeOfAircraft() {
-        List<String> majorTypesSpa = Collections.singletonList("Tiempo");
-        return extractCustomAnnotation(annotations, text, "Lookup", majorTypesSpa);
+        List<String> majorTypesSpa = Collections.singletonList("TypeOfAircraft");
+        return extractCustomAnnotation(annotations, text, "Mention", majorTypesSpa);
     }
 
     private Map<String, String> extractYear() {
-        List<String> majorTypesSpa = Collections.singletonList("year");
-        return extractCustomAnnotation(annotations, text, "Lookup", majorTypesSpa);
+        List<String> majorTypesSpa = Collections.singletonList("Year");
+        return extractCustomAnnotation(annotations, text, "Mention", majorTypesSpa);
     }
 }

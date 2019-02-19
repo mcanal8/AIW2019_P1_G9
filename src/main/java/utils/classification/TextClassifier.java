@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -161,7 +162,7 @@ public class TextClassifier {
                        return;
                }
 
-               extractor.extract();
+               System.out.println(prettyPrint(extractor.extract()));
 
                classifier.removeInstance();
                Factory.deleteResource(document);
@@ -180,4 +181,10 @@ public class TextClassifier {
        log.info("GOOD BYE!");
        log.info("****");
    }
+   
+       private static String prettyPrint(Map<String, Map<String, String>> results){
+        //results.forEach(
+        //);
+        return results.toString();
+    }
 }

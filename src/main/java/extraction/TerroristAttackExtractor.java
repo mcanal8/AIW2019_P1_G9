@@ -23,44 +23,42 @@ public class TerroristAttackExtractor extends DomainExtractor {
         result.put("perpetrator", extractPerpetrator());
         result.put("place", extractPlace());
         result.put("typeOfAttack", extractTypeOfAttack());
+        
         return result;
     }
 
     private Map<String, String> extractDateOfAttack() {
-        List<String> majorTypesSpa = Collections.singletonList("Tiempo");
-        return extractCustomAnnotation(annotations, text,"Lookup", majorTypesSpa);
+        List<String> majorTypesSpa = Collections.singletonList("DateOfAttack");
+        return extractCustomAnnotation(annotations, text,"Mention", majorTypesSpa);
     }
 
     private Map<String, String> extractFatalities() {
-        //List<String> majorTypes = Collections.singletonList("person_first");
-        //return extractCustomAnnotation(annotations, text, "Lookup", majorTypes);
-        return new HashMap<>();
+        List<String> majorTypesSpa = Collections.singletonList("Fatalities");
+        return extractCustomAnnotation(annotations, text,"Mention", majorTypesSpa);
     }
 
     private Map<String, String> extractInjured() {
-        //List<String> majorTypes = Collections.singletonList("person_first");
-        //return extractCustomAnnotation(annotations, text, "Lookup", majorTypes);
-        return new HashMap<>();
+        List<String> majorTypesSpa = Collections.singletonList("Injured");
+        return extractCustomAnnotation(annotations, text,"Mention", majorTypesSpa);
     }
 
     private Map<String, String> extractNameOfVictim() {
-        List<String> majorTypes = Collections.singletonList("Persona");
-        return extractCustomAnnotation(annotations, text, "Lookup", majorTypes);
+        List<String> majorTypes = Collections.singletonList("NameOfVictim");
+        return extractCustomAnnotation(annotations, text, "Mention", majorTypes);
     }
 
     private Map<String, String> extractPerpetrator() {
-        List<String> majorTypes = Collections.singletonList("Persona");
-        return extractCustomAnnotation(annotations, text, "Lookup", majorTypes);
+        List<String> majorTypes = Collections.singletonList("Perpetrator");
+        return extractCustomAnnotation(annotations, text, "Mention", majorTypes);
     }
 
     private Map<String, String> extractPlace() {
-        List<String> majorTypesSpa = Collections.singletonList("Lugar");
-        return extractCustomAnnotation(annotations, text, "Lookup", majorTypesSpa);
+        List<String> majorTypesSpa = Collections.singletonList("Place");
+        return extractCustomAnnotation(annotations, text, "Mention", majorTypesSpa);
     }
 
     private Map<String, String> extractTypeOfAttack() {
-        //List<String> majorTypesSpa = Collections.singletonList("Lugar");
-        //return extractCustomAnnotation(annotations, text, "Lookup", majorTypesSpa);
-        return new HashMap<>();
+        List<String> majorTypesSpa = Collections.singletonList("TypeOfAttack");
+        return extractCustomAnnotation(annotations, text, "Mention", majorTypesSpa);
     }
 }

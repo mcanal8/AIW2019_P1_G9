@@ -15,8 +15,6 @@ public class CommonsUtilsExtractor {
     static Map<String, String> extractCustomAnnotation(AnnotationSet annotations, String text, String annotationName, List<String> majorTypes) {
         Map<String, String> result = new HashMap<>();
 
-        System.out.println(annotations.toString());
-
         AnnotationSet lookUpAnnotations = annotations.get(annotationName);
         Long start;
         Long end;
