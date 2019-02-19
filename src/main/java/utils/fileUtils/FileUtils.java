@@ -15,7 +15,7 @@ import static java.nio.charset.StandardCharsets.ISO_8859_1;
 
 public class FileUtils implements FileUtilsInterface{
 
-    private final static Logger log = Logger.getLogger(FileUtils.class);
+    private static final Logger log = Logger.getLogger(FileUtils.class);
     private static final String TEXT_FILES_PATH = "Concisus-v3/text_files";
     private static final String RESULT_FILE_NAME = System.getProperty("user.dir") + "/resultFile.txt";
     private static final Path OUTPUT_PATH = Paths.get(RESULT_FILE_NAME);

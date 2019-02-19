@@ -162,7 +162,9 @@ public class TextClassifier {
                        return;
                }
 
-               System.out.println(prettyPrint(extractor.extract()));
+               log.info("I FOUND THE FOLLOWING USEFUL INFORMATION ABOUT THE " + topic.name().toUpperCase());
+
+               prettyPrint(extractor.extract());
 
                classifier.removeInstance();
                Factory.deleteResource(document);
@@ -182,9 +184,10 @@ public class TextClassifier {
        log.info("****");
    }
    
-       private static String prettyPrint(Map<String, Map<String, String>> results){
-        //results.forEach(
-        //);
-        return results.toString();
+       private static void prettyPrint(Map<String, String> results){
+
+           for (Map.Entry<String, String> result : results.entrySet()) {
+               log.info(result.getKey() + ": " + result.getValue());
+           }
     }
 }

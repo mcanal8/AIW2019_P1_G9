@@ -17,7 +17,7 @@ public abstract class DomainExtractor {
         this.annotations = annotations;
     }
 
-    public abstract Map<String, Map<String, String>> extract();
+    public abstract Map<String, String> extract();
 
     public Languages getLanguage() {
         return language;
