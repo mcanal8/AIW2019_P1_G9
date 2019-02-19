@@ -139,8 +139,8 @@ public class TextClassifier {
 
                switch (language){
                    case SPANISH:
-                       ieSpanish.setCorpus(corpus);
-                       ieSpanish.executeMyGapp();
+                       ieSpanish.setCorpusSerial(corpus);
+                       ieSpanish.executeSerialMyGapp();
                        break;
                    case ENGLISH:
                        ieEnglish.setCorpus(corpus);

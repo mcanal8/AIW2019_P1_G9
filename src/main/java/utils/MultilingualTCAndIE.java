@@ -43,9 +43,9 @@ public class MultilingualTCAndIE {
         try {
 
             if(Gate.getGateHome() == null)
-                Gate.setGateHome(new File(USER_HOME_DIRECTORY + "/GATE_Developer_8.0"));
+                Gate.setGateHome(new File("C:\\Users\\u124275\\Desktop\\gate-8.0-build4825-BIN"));
             if(Gate.getPluginsHome() == null)
-                Gate.setPluginsHome(new File(USER_HOME_DIRECTORY + "/GATE_Developer_8.0/plugins"));
+                Gate.setPluginsHome(new File("C:\\Users\\u124275\\Desktop\\gate-8.0-build4825-BIN\\plugins"));
 
             Gate.init();
             CallMyGATEApp myanalyser=new CallMyGATEApp();
@@ -57,7 +57,7 @@ public class MultilingualTCAndIE {
             log.info("Loading IE System for aviation accidents (English).....done!");
 
             CallMyGATEApp ieSpanish = new CallMyGATEApp();
-            ieSpanish.loadMyGapp(USER_PROJECT_DIRECTORY + "/gapps/IE_ATTACK_ES.gapp");
+            ieSpanish.loadMyGappSerialAnalyser(USER_PROJECT_DIRECTORY + "/gapps/IE_ATTACK_ES.gapp");
             log.info("Loading IE System for terrorist attacks (Spanish).....done!");
 
             analyze(classifier, myanalyser, ieEnglish, ieSpanish);
